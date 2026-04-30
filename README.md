@@ -130,7 +130,9 @@ Refer to LICENSE and NOTICE.md for full details.
 ## 📬 Contact
 
 📧 Email: mahapatragopalkrushna34@gmail.com
+
 💼 LinkedIn: http://www.linkedin.com/in/gopal-krushna-mahapatra-3a974928b
+
 🧑‍💻 GitHub: https://github.com/Gopal-star2005
 
 ⭐ If you find this project useful, consider giving it a star.
