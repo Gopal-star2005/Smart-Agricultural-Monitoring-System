@@ -1,0 +1,386 @@
+/*Nodemcu ESP8266 WIFI control car.
+* This code created by sritu hobby team.
+* https://srituhobby.com
+*/
+#define BLYNK_TEMPLATE_ID "Your Template ID"
+#define BLYNK_TEMPLATE_NAME "Your Template Name"
+#define BLYNK_AUTH_TOKEN "Your Auth Token"
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+//Motor PINs
+#define ENA 16
+#define IN1 5
+#define IN2 4
+#define IN3 0
+#define IN4 2
+#define ENB 14
+#define switch 13
+#define S1 12
+#define S2 15
+bool forward = 0;
+bool backward = 0;
+bool left = 0;
+bool right = 0;
+int Speed;
+char auth[] = "Enter your Blynk auth token";
+char ssid[] = "Enter your WIFI name":
+char pass[] = "Enter your WIFI passowrd";
+void setup() {
+Serial.begin(9600);
+pinMode(ENA, OUTPUT);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+pinMode(IN3, OUTPUT);
+pinMode(IN4, OUTPUT);
+pinMode(ENB, OUTPUT);
+pinMode(S1, INPUT);
+pinMode(S2, INPUT);
+Blynk.begin(auth, ssid, pass);
+}
+BLYNK_WRITE(V0) {
+forward = param.asInt();
+}
+BLYNK_WRITE(V1) {
+backward = param.asInt();
+}
+BLYNK_WRITE(V2) {
+left = param.asInt();
+}
+BLYNK_WRITE(V3) {
+right = param.asInt();
+}
+Speed = param.asInt();
+}
+void smartcar()
+{
+if (forward == 1) {
+carforward();
+Serial.println("carforward");
+} else if (backward == 1) {
+carbackward();
+Serial.println("carbackward");
+} else if (left == 1) {
+carturnleft();
+Serial.println("carfleft");
+} else if (right == 1) {
+carturnright();
+Serial.println("carright");
+} else if (forward == 0 && backward == 0 && left == 0 && right == 0) {
+carStop();
+Serial.println("carstop");
+}
+}
+void automode()
+{
+if(digitalRead(S1)==HIGH && digitalRead(S2)==HIGH)
+{
+carforward();
+}
+if(digitalRead(S1)==LOW && digitalRead(S2)==HIGH)
+{
+carturnright();
+}
+if(digitalRead(S1)==HIGH && digitalRead(S2)==LOW)
+{
+carturnleft();
+}
+if(digitalRead(S1)==LOW && digitalRead(S2)==LOW)
+{
+carStop();
+}
+}
+void loop()
+{
+if(digitalRead(switch)== 1)
+{
+Serial.println("Auto Mode");
+automode();
+}
+else if(digitalRead(switch)== 0)
+{
+Serial.println("Manual Mode");
+smartcar();
+}
+Blynk.run();
+}
+void carforward() {
+analogWrite(ENA, Speed);
+analogWrite(ENB, Speed);
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, HIGH);
+digitalWrite(IN3, HIGH);
+digitalWrite(IN4, LOW);
+}
+void carbackward() {
+analogWrite(ENA, Speed);
+analogWrite(ENB, Speed);
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, HIGH);
+}
+void carturnleft() {
+analogWrite(ENA, Speed);
+analogWrite(ENB, Speed);
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, HIGH);
+digitalWrite(IN4, LOW);
+}
+void carturnright() {
+analogWrite(ENA, Speed);
+analogWrite(ENB, Speed);
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, HIGH);
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, HIGH);
+}
+void carStop() {
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, LOW);
+}
+
+// Code for Agricultural Monitoring System
+// IOT Based Smart Agriculture Monitoring System
+#define BLYNK_TEMPLATE_ID "Your Template ID"
+#define BLYNK_DEVICE_NAME "Your Template Name"
+#define BLYNK_AUTH_TOKEN "Your Auth Token"
+#define BLYNK_PRINT Serial
+#include <SPI.h> //Including libraries
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <Adafruit_I2CDevice.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <DHT.h>
+#include <Servo.h>
+Servo servo;
+BlynkTimer timer;
+char auth[]="Your Blynk Auth Token";
+char ssid[] = "Your Wifi ID"; 
+char pass[] = "Your Password"; 
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET -1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#define DHTPIN 2
+//Pin defining for dht22 (D4)
+DHT dht(DHTPIN, DHT22);
+#define ONE_WIRE_BUS 12
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+#define buzzer 14 //Pin defining for Buzzer (D5)
+#define rainPin 13 //Pin defining for Rain sensore (D7)
+#define relay 16
+int rainState = 0;
+int lastRainState = 0;
+const int AirValue = 590;
+const int WaterValue = 300;
+const int SensorPin = A0; //Analog pin(A0) for Soil Moisture
+int soilMoistureValue = 0;
+int soilmoisturepercent = 0;
+#define pirPin 0
+int pirValue;
+int pinValue;
+#define motorPin 12
+int motoron;
+int motoroff;
+void setup()
+{
+Serial.begin(115200);
+delay(100);
+Blynk.begin(auth, ssid, pass);
+display.begin(SSD1306_SWITCHCAPVCC, 0x3C); //initializing OLED(128x64)
+display.clearDisplay();
+pinMode(relay,OUTPUT);
+pinMode(buzzer,OUTPUT);
+pinMode(motorPin,OUTPUT);
+servo.attach(15);
+servo.write(0);
+sensors.begin();
+dht.begin();
+}
+void Hydrulic()
+{
+if(digitalRead(motorPin)== 1)
+{
+Serial.println("Hydrulic is ON");
+}
+else if(digitalRead(motorPin)== 0)
+{
+Serial.println("Hydrulic is OFF");
+}
+}
+void getPirValue(void)
+{
+pirValue = digitalRead(pirPin);
+if (pirValue)
+{
+Serial.println("Motion Detected");
+digitalWrite(buzzer, HIGH);
+servo.write(90);
+delay(100);
+}
+else
+{
+servo.write(0);
+delay(100);
+}
+}
+void loop()
+{
+Blynk.run();
+float h = dht.readHumidity();
+float t = dht.readTemperature();
+sensors.requestTemperatures();
+float temp = sensors.getTempCByIndex(0);
+Serial.print("Soil Temperature: ");
+Serial.println(temp);
+Serial.print("Temperature: ");
+Serial.println(t);
+Serial.print("Humidity: ");
+Serial.println(h);
+Blynk.virtualWrite(V7, t); //V7 is for Temperature
+Blynk.virtualWrite(V5, h); //V5 is for Humidity
+soilMoistureValue = analogRead(SensorPin);
+Serial.println(soilMoistureValue);
+soilmoisturepercent = map(soilMoistureValue, AirValue, WaterValue, 0,
+100);
+Blynk.virtualWrite(V3, soilmoisturepercent); //V3 Soil Moisture sensor
+if (soilmoisturepercent > 100)
+{
+Serial.println("100 %");
+delay(1500);
+display.clearDisplay();
+// Display Water precentage of Soil
+display.setTextColor(WHITE);
+display.setTextSize(1);
+display.setCursor(0, 20);
+display.print("WP of Soil:");
+display.print("100");
+display.print(" %");
+// Display relative Temperature of Air
+display.setCursor(0, 35);
+display.print("RT of Air:");
+display.print(t);
+display.print(" ");
+display.cp437(true);
+display.write(167);
+display.print("C");
+// Display relative Humidity of Air
+display.setCursor(0, 50);
+display.print("RH of Air:");
+display.print(h);
+display.print(" %");
+display.display();
+delay(1500);
+}
+else if (soilmoisturepercent < 0)
+{
+Serial.println("0 %");
+delay(1500);
+display.clearDisplay();
+// Display Water precentage of Soil
+display.setTextColor(WHITE);
+display.setTextSize(1);
+display.setCursor(0, 20);
+display.print("WP of Soil:");
+display.print("0");
+display.print(" %");
+// Display relative Temperature of Air
+display.setCursor(0, 35);
+display.print("RT of Air:");
+display.print(t);
+display.print(" ");
+display.cp437(true);
+display.write(167);
+display.print("C");
+// Display relative Humidity of Air
+display.setCursor(0, 50);
+display.print("RH of Air:");
+display.print(h);
+display.print(" %");
+display.display();
+delay(1500);
+}
+else if (soilmoisturepercent >= 0 && soilmoisturepercent <= 100)
+{
+Serial.print(soilmoisturepercent);
+Serial.println("%");
+delay(1500);
+display.clearDisplay();
+// Display Water precentage of Soil
+display.setTextColor(WHITE);
+display.setTextSize(1);
+display.setCursor(0, 20);
+display.print("WP of Soil:");
+display.print(soilmoisturepercent);
+display.print(" %");
+// Display relative Temperature of Air
+display.setCursor(0, 35);
+display.print("RT of Air:");
+display.print(t);
+display.print(" ");
+display.cp437(true);
+display.write(167);
+display.print("C");
+// Display relative Humidity of Air
+display.setCursor(0, 50);
+display.print("RH of Air:");
+display.print(h);
+display.print(" %");
+display.display();
+delay(1500);
+}
+if (soilmoisturepercent >= 0 && soilmoisturepercent <= 30)
+{
+Serial.println("needs water, send notification");
+//Blynk.notify("Plants need water...") ;
+//Send notification
+digitalWrite(relay, LOW);
+Serial.println("Motor is ON");
+WidgetLED PumpLed(V0);
+PumpLed.on();
+delay(1000);
+}
+else if (soilmoisturepercent > 30 && soilmoisturepercent <= 100)
+{
+Serial.println("Soil Moisture level looks good...");
+digitalWrite(relay, HIGH);
+Serial.println("Motor is OFF");
+WidgetLED PumpLed(V0);
+PumpLed.off();
+delay(1000);
+}
+rainState = digitalRead(rainPin);
+Serial.println(rainState);
+if (rainState == 0 && lastRainState == 0)
+{
+Serial.println("It's Raining outside!");
+//Blynk.notify("It's Raining outside!") ;
+//Send notification
+lastRainState = 1;
+delay(1000);
+}
+else if (rainState == 0 && lastRainState == 1)
+{
+delay(1000);
+}
+else
+{
+Serial.println("No Rains...");
+lastRainState = 0;
+delay(1000);
+}
+delay(100);
+Blynk.run();
+timer.run();
+}
