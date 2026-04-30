@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Gopal-star2005/IoT-Agriculture-System/main/assets/banner.svg" alt="IoT Agriculture Monitoring System Banner" />
+  <img src="https://raw.githubusercontent.com/Gopal-star2005/Smart-Agricultural-Monitoring-System/main/assets/banner.svg" alt="IoT Agriculture Monitoring System Banner" />
 </p>
 
 # 🌱 IoT-Based Smart Agriculture Monitoring System using ESP32  
